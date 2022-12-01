@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:app="http://schemas.android.com/apk/res-auto"
+	android:id="@+id/webLayout"
+	android:layout_width="match_parent"
+	android:layout_height="match_parent">
+
+	<WebView
+		android:id="@+id/web_view"
+		android:layout_width="match_parent"
+		android:layout_height="match_parent" />
+
+	<ImageButton
+		android:id="@+id/btn_close"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:layout_marginTop="25dp"
+		android:layout_marginEnd="25dp"
+		android:background="@android:color/transparent"
+		android:contentDescription="@string/close"
+		android:src="@drawable/selector_close_with_boarder"
+		app:layout_constraintEnd_toEndOf="parent"
+		app:layout_constraintTop_toTopOf="parent" />
+</androidx.constraintlayout.widget.ConstraintLayout>

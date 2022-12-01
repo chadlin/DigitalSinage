@@ -1,0 +1,11 @@
+<resources>
+	<string name="app_name">LoadHtml</string>
+	<string name="media_url_mp3">https://storage.googleapis.com/exoplayer-test-media-0/Jazz_In_Paris.mp3</string>
+	<string name="media_url_mp4">https://storage.googleapis.com/exoplayer-test-media-0/BigBuckBunny_320x180.mp4</string>
+	<string name="media_url_m3u8">http://sample.vodobox.net/skate_phantom_flex_4k/skate_phantom_flex_4k.m3u8</string>
+	<string name="media_url_hls">http://qthttp.apple.com.edgesuite.net/1010qwoeiuryfg/sl.m3u8</string>
+	<string name="close">close</string>
+
+
+
+</resources>
