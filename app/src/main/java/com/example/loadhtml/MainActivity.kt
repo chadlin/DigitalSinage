@@ -7,7 +7,9 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.webkit.WebSettings
 import android.webkit.WebView
+import android.webkit.WebViewClient
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
@@ -45,11 +47,11 @@ class MainActivity : AppCompatActivity() {
 	private var currentItem = 0
 	private var playbackPosition = 0L
 
-	private val verticalWeight = arrayListOf(1f, 5f, 1f)
+	private val verticalWeight = arrayListOf(0f, 5f, 0.5f)
 	private val midWeight = arrayListOf(2f, 1f)
 
 	private val templateType =
-		arrayListOf<String>(TYPE_WEB, TYPE_IMAGE, TYPE_VIDEO, TYPE_DEFAULT)
+		arrayListOf<String>(TYPE_DEFAULT, TYPE_WEB, TYPE_VIDEO, TYPE_IMAGE)
 
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
@@ -76,7 +78,7 @@ class MainActivity : AppCompatActivity() {
 			setView2Layout(getBroadcastView(templateType[0]), viewBinding.topRow)
 			setView2Layout(getBroadcastView(templateType[1]), viewBinding.leftConstraintLayout)
 			setView2Layout(getBroadcastView(templateType[2]), viewBinding.rightConstraintLayout)
-			setView2Layout(getBroadcastView(templateType[3]), viewBinding.bottomRow)
+//			setView2Layout(getBroadcastView(templateType[3]), viewBinding.bottomRow)
 
 		}
 
@@ -124,8 +126,32 @@ class MainActivity : AppCompatActivity() {
 			settings.builtInZoomControls = true
 			loadUrl("file:///android_asset/index.html")
 //			loadData("<html><body>Hello, world!</body></html>", "text/html", "UTF-8")
+//			loadData("<!DOCTYPE html><html lang=\"en\"><head><meta charset=\"UTF-8\"><meta http-equiv=\"X-UA-Compatible\" content=\"IE=edge\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"><title>Document</title></head><body style=\"background-color: red;\">Hello World</body></html>", "text/html", "UTF-8")
+
 		}
 		return webLayout
+	}
+
+	private fun getEmbededWebView(): View {
+//		checkWebView()
+		return LayoutInflater.from(this).inflate(R.layout.layout_web_broadcast, null).apply {
+			val webView = findViewById<WebView>(R.id.web_view)
+			webView.apply {
+				webViewClient = WebViewClient()
+				scrollBarStyle = View.SCROLLBARS_INSIDE_OVERLAY
+				isHorizontalScrollBarEnabled = false
+				isVerticalScrollBarEnabled = false
+				settings.apply {
+					setAppCacheEnabled(true)
+					cacheMode = WebSettings.LOAD_CACHE_ELSE_NETWORK
+					javaScriptEnabled = true
+					userAgentString = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.137 Safari/537.36"
+					mediaPlaybackRequiresUserGesture = false
+				}
+				loadUrl("https://www.youtube.com/watch?v=tq5pFhxZKFc")
+				setOnTouchListener { _, _ -> true }
+			}
+		}
 	}
 
 	private fun setView2Layout(view: View?, layout: ConstraintLayout) {
@@ -165,9 +191,11 @@ class MainActivity : AppCompatActivity() {
 				ConstraintSet.END,
 				R.id.leftConstraintLayout,
 				ConstraintSet.START,
-				dp2px(4f).toInt()
 			)
-			setHorizontalWeight(R.id.rightConstraintLayout, midWeight[0])
+//			setHorizontalWeight(R.id.rightConstraintLayout, midWeight[0])
+			setDimensionRatio(R.id.rightConstraintLayout, "16:9")
+			constrainWidth(R.id.rightConstraintLayout, ConstraintLayout.LayoutParams.MATCH_CONSTRAINT)
+			constrainHeight(R.id.rightConstraintLayout, ConstraintLayout.LayoutParams.MATCH_PARENT)
 			connect(R.id.leftConstraintLayout, ConstraintSet.TOP, R.id.midRow, ConstraintSet.TOP)
 			connect(
 				R.id.leftConstraintLayout,
@@ -182,9 +210,7 @@ class MainActivity : AppCompatActivity() {
 				ConstraintSet.END
 			)
 			connect(R.id.leftConstraintLayout, ConstraintSet.END, R.id.midRow, ConstraintSet.END)
-			setHorizontalWeight(R.id.leftConstraintLayout, midWeight[1])
-			setDimensionRatio(R.id.leftConstraintLayout, "16:9")
-			setDimensionRatio(R.id.rightConstraintLayout, "16:9")
+//			setHorizontalWeight(R.id.leftConstraintLayout, midWeight[1])
 		}
 		midConstraintSet.applyTo(viewBinding.midRow)
 //		TransitionManager.beginDelayedTransition(viewBinding.midRow)
