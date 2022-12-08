@@ -31,7 +31,7 @@
 			android:id="@+id/leftConstraintLayout"
 			android:layout_width="0dp"
 			android:layout_height="match_parent"
-			app:layout_constraintHorizontal_weight="2"
+			app:layout_constraintHorizontal_weight="3"
 			app:layout_constraintStart_toStartOf="parent"
 			app:layout_constraintEnd_toStartOf="@id/rightConstraintLayout">
 
@@ -43,6 +43,7 @@
 			android:layout_width="0dp"
 			android:layout_height="match_parent"
 			app:layout_constraintHorizontal_weight="1"
+			android:background="#ffffcc"
 			app:layout_constraintStart_toEndOf="@id/leftConstraintLayout"
 			app:layout_constraintEnd_toEndOf="parent"/>
 
@@ -99,10 +100,10 @@
 				app:layout_constraintTop_toTopOf="parent"/>
 
 			<Button
-				android:id="@+id/setWebView"
+				android:id="@+id/addView"
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
-				android:text="setWebView"
+				android:text="addView"
 				app:layout_constraintStart_toEndOf="@id/setPlayer"
 				app:layout_constraintBottom_toBottomOf="parent"/>
 

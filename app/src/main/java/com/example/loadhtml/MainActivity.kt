@@ -1,9 +1,11 @@
 package com.example.loadhtml
 
 import android.content.Context
+import android.graphics.Color
 import android.os.Bundle
 import android.transition.TransitionManager
 import android.util.Log
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,21 +13,26 @@ import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.ImageView
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.constraintlayout.widget.ConstraintLayout.LayoutParams
 import androidx.constraintlayout.widget.ConstraintSet
-import androidx.core.view.*
+import androidx.core.view.WindowCompat
+import androidx.core.view.forEachIndexed
+import androidx.core.view.indices
+import androidx.core.view.size
 import com.example.loadhtml.databinding.ActivityMainBinding
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.source.MediaSource
 import com.google.android.exoplayer2.source.hls.HlsMediaSource
-import com.google.android.exoplayer2.ui.PlayerControlView
 import com.google.android.exoplayer2.ui.PlayerView
 import com.google.android.exoplayer2.upstream.DataSource
 import com.google.android.exoplayer2.upstream.DefaultHttpDataSource
 import com.google.android.exoplayer2.util.EventLogger
 import com.google.android.exoplayer2.util.Util
+import java.util.*
 
 
 class MainActivity : AppCompatActivity() {
@@ -82,11 +89,114 @@ class MainActivity : AppCompatActivity() {
 
 		}
 
-		viewBinding.setWebView.setOnClickListener {
-			setView2Layout(getWebView(), viewBinding.leftConstraintLayout)
+		viewBinding.addView.setOnClickListener {
+			addViewUseLayoutParams()
 		}
 
 	}
+
+	private val xArray = arrayOf(
+		arrayOf(3), arrayOf(1)
+	)
+
+	private val yArray = arrayOf(
+		arrayOf(1, 4), arrayOf(5)
+	)
+
+	fun getRandomColor(): Int {
+		val rnd = Random()
+		return Color.argb(255, rnd.nextInt(256), rnd.nextInt(256), rnd.nextInt(256))
+	}
+
+
+	private fun addViewUseLayoutParams() {
+		val constraintLayout = ConstraintLayout(this)
+		constraintLayout.id = getLayoutCounter()
+		constraintLayout.background = getDrawable(R.color.teal_700)
+		constraintLayout.layoutParams = ViewGroup.LayoutParams(
+			LayoutParams.MATCH_PARENT,
+			LayoutParams.MATCH_PARENT
+		)
+		//先设置根布局
+		setContentView(constraintLayout)
+
+		setColumnLayout(constraintLayout, xArray)
+
+		constraintLayout.forEachIndexed { index, view ->
+			setRowLayout(view as ConstraintLayout, yArray[index])
+		}
+
+	}
+
+	var counter = 0
+
+	private fun getLayoutCounter(): Int {
+		return counter++
+	}
+
+	private fun setColumnLayout(parentLayout: ConstraintLayout, weightArray: Array<*>) {
+
+
+		for (i in weightArray.indices) {
+			val constraintLayout = ConstraintLayout(this).apply {
+				id = getLayoutCounter()
+				background =
+					getDrawable(if (i % 2 == 0) R.color.purple_500 else com.google.android.material.R.color.primary_dark_material_light)
+			}
+
+			val textView = TextView(this).apply {
+				text = constraintLayout.id.toString()
+				gravity = Gravity.CENTER_VERTICAL
+				textSize = 50f
+			}
+			constraintLayout.addView(textView)
+
+			val constraintLayoutParams = LayoutParams(200, LayoutParams.MATCH_PARENT)
+			if (i == 0) {
+				constraintLayoutParams.topToTop = parentLayout.id
+				constraintLayoutParams.leftToLeft = parentLayout.id
+			} else {
+				constraintLayoutParams.topToTop = parentLayout.id
+				constraintLayoutParams.startToEnd = constraintLayout.id - 1
+			}
+
+			constraintLayout.layoutParams = constraintLayoutParams
+			Log.d(
+				"XXXXX",
+				"setColumnLayout: $i, ${constraintLayout.id}, ${constraintLayout.background} ${parentLayout.id}"
+			)
+			parentLayout.addView(constraintLayout)
+		}
+	}
+
+	private fun setRowLayout(parentLayout: ConstraintLayout, weightArray: Array<*>) {
+		for (j in weightArray.indices) {
+			val constraintLayout = ConstraintLayout(this).apply {
+				id = getLayoutCounter()
+				background = getDrawable(if (j % 2 == 0) R.color.teal_200 else R.color.white)
+			}
+
+			val constraintLayoutParams: ConstraintLayout.LayoutParams =
+				ConstraintLayout.LayoutParams(
+					150, 200
+				)
+
+
+			if (j == 0) {
+				constraintLayoutParams.rightToRight = parentLayout.id
+				constraintLayoutParams.topToTop = parentLayout.id
+			} else {
+				constraintLayoutParams.topToBottom = constraintLayout.id - 1
+				constraintLayoutParams.rightToRight = parentLayout.id
+			}
+
+			constraintLayout.layoutParams = constraintLayoutParams
+			Log.d("XXXXX", "setRowLayout: ${constraintLayout.id}")
+			parentLayout.addView(constraintLayout)
+
+		}
+	}
+
 
 	private fun getBroadcastView(type: String): View {
 		Log.d("XXXXX", "getBroadcastView: $type")
@@ -145,7 +255,8 @@ class MainActivity : AppCompatActivity() {
 					setAppCacheEnabled(true)
 					cacheMode = WebSettings.LOAD_CACHE_ELSE_NETWORK
 					javaScriptEnabled = true
-					userAgentString = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.137 Safari/537.36"
+					userAgentString =
+						"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.137 Safari/537.36"
 					mediaPlaybackRequiresUserGesture = false
 				}
 				loadUrl("https://www.youtube.com/watch?v=tq5pFhxZKFc")
@@ -194,7 +305,10 @@ class MainActivity : AppCompatActivity() {
 			)
 //			setHorizontalWeight(R.id.rightConstraintLayout, midWeight[0])
 			setDimensionRatio(R.id.rightConstraintLayout, "16:9")
-			constrainWidth(R.id.rightConstraintLayout, ConstraintLayout.LayoutParams.MATCH_CONSTRAINT)
+			constrainWidth(
+				R.id.rightConstraintLayout,
+				ConstraintLayout.LayoutParams.MATCH_CONSTRAINT
+			)
 			constrainHeight(R.id.rightConstraintLayout, ConstraintLayout.LayoutParams.MATCH_PARENT)
 			connect(R.id.leftConstraintLayout, ConstraintSet.TOP, R.id.midRow, ConstraintSet.TOP)
 			connect(
