@@ -5,10 +5,8 @@ import android.graphics.Color
 import android.os.Bundle
 import android.transition.TransitionManager
 import android.util.Log
-import android.view.Gravity
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
+import android.view.ViewGroup.LayoutParams.MATCH_PARENT
 import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebViewClient
@@ -17,11 +15,11 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintLayout.LayoutParams
+import androidx.constraintlayout.widget.ConstraintLayout.LayoutParams.MATCH_CONSTRAINT
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.view.WindowCompat
 import androidx.core.view.forEachIndexed
 import androidx.core.view.indices
-import androidx.core.view.size
 import com.example.loadhtml.databinding.ActivityMainBinding
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.MediaItem
@@ -58,7 +56,9 @@ class MainActivity : AppCompatActivity() {
 	private val midWeight = arrayListOf(2f, 1f)
 
 	private val templateType =
-		arrayListOf<String>(TYPE_DEFAULT, TYPE_WEB, TYPE_VIDEO, TYPE_IMAGE)
+		arrayListOf<String>(TYPE_DEFAULT, TYPE_VIDEO, TYPE_WEB, TYPE_IMAGE)
+
+	private var layoutNaming = 0
 
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
@@ -74,7 +74,8 @@ class MainActivity : AppCompatActivity() {
 		}
 
 		viewBinding.midChange.setOnClickListener {
-			changeMidConstraintSet()
+//			switchMidConstraintSet()
+			changeMidRowLayout(layoutNaming)
 		}
 
 		viewBinding.verticalChange.setOnClickListener {
@@ -93,6 +94,83 @@ class MainActivity : AppCompatActivity() {
 			addViewUseLayoutParams()
 		}
 
+	}
+
+
+	private fun changeMidRowLayout(layout: Int) {
+		val midRow = viewBinding.midRow
+		val midConstraint = ConstraintSet().apply {
+			clone(midRow)
+			when (layout) {
+				0 -> {
+					Log.d("XXXXX", "changeMidConstraint: left 16.9")
+					resetMidRow()
+					setDimensionRatio(R.id.leftConstraintLayout, "16:9")
+					constrainHeight(R.id.leftConstraintLayout, MATCH_PARENT)
+					constrainWidth(R.id.leftConstraintLayout, MATCH_CONSTRAINT)
+					layoutNaming = 1
+				}
+				1 -> {
+					Log.d("XXXXX", "changeMidConstraint: right 16.9")
+					resetMidRow()
+					setDimensionRatio(R.id.rightConstraintLayout, "16:9")
+					constrainHeight(R.id.rightConstraintLayout, MATCH_PARENT)
+					constrainWidth(R.id.rightConstraintLayout, MATCH_CONSTRAINT)
+					layoutNaming = 2
+				}
+				else -> {
+					Log.d("XXXXXX", "changeMidConstraint: else")
+					resetMidRow()
+					setHorizontalWeight(R.id.leftConstraintLayout, 2f)
+					setHorizontalWeight(R.id.rightConstraintLayout, 1f)
+					layoutNaming = 0
+				}
+			}
+		}
+		midConstraint.applyTo(midRow)
+	}
+
+	private fun ConstraintSet.resetMidRow() {
+		clear(R.id.leftConstraintLayout)
+		clear(R.id.rightConstraintLayout)
+		connect(R.id.rightConstraintLayout, ConstraintSet.TOP, R.id.midRow, ConstraintSet.TOP)
+		connect(
+			R.id.rightConstraintLayout,
+			ConstraintSet.BOTTOM,
+			R.id.midRow,
+			ConstraintSet.BOTTOM
+		)
+		connect(R.id.leftConstraintLayout, ConstraintSet.TOP, R.id.midRow, ConstraintSet.TOP)
+		connect(
+			R.id.leftConstraintLayout,
+			ConstraintSet.BOTTOM,
+			R.id.midRow,
+			ConstraintSet.BOTTOM
+		)
+		connect(
+			R.id.leftConstraintLayout,
+			ConstraintSet.START,
+			R.id.midRow,
+			ConstraintSet.START
+		)
+		connect(
+			R.id.leftConstraintLayout,
+			ConstraintSet.END,
+			R.id.rightConstraintLayout,
+			ConstraintSet.START,
+		)
+		connect(
+			R.id.rightConstraintLayout,
+			ConstraintSet.END,
+			R.id.midRow,
+			ConstraintSet.END
+		)
+		connect(
+			R.id.rightConstraintLayout,
+			ConstraintSet.START,
+			R.id.leftConstraintLayout,
+			ConstraintSet.END,
+		)
 	}
 
 	private val xArray = arrayOf(
@@ -279,18 +357,10 @@ class MainActivity : AppCompatActivity() {
 		parentView.removeView(this)
 	}
 
-	private fun changeMidConstraintSet() {
+	private fun switchMidConstraintSet() {
 		val midConstraintSet = ConstraintSet().apply {
 			clone(viewBinding.midRow)
-			clear(R.id.leftConstraintLayout)
-			clear(R.id.rightConstraintLayout)
-			connect(R.id.rightConstraintLayout, ConstraintSet.TOP, R.id.midRow, ConstraintSet.TOP)
-			connect(
-				R.id.rightConstraintLayout,
-				ConstraintSet.BOTTOM,
-				R.id.midRow,
-				ConstraintSet.BOTTOM
-			)
+			resetMidRow()
 			connect(
 				R.id.rightConstraintLayout,
 				ConstraintSet.START,
@@ -303,20 +373,12 @@ class MainActivity : AppCompatActivity() {
 				R.id.leftConstraintLayout,
 				ConstraintSet.START,
 			)
-//			setHorizontalWeight(R.id.rightConstraintLayout, midWeight[0])
 			setDimensionRatio(R.id.rightConstraintLayout, "16:9")
 			constrainWidth(
 				R.id.rightConstraintLayout,
 				ConstraintLayout.LayoutParams.MATCH_CONSTRAINT
 			)
 			constrainHeight(R.id.rightConstraintLayout, ConstraintLayout.LayoutParams.MATCH_PARENT)
-			connect(R.id.leftConstraintLayout, ConstraintSet.TOP, R.id.midRow, ConstraintSet.TOP)
-			connect(
-				R.id.leftConstraintLayout,
-				ConstraintSet.BOTTOM,
-				R.id.midRow,
-				ConstraintSet.BOTTOM
-			)
 			connect(
 				R.id.leftConstraintLayout,
 				ConstraintSet.START,
@@ -324,7 +386,6 @@ class MainActivity : AppCompatActivity() {
 				ConstraintSet.END
 			)
 			connect(R.id.leftConstraintLayout, ConstraintSet.END, R.id.midRow, ConstraintSet.END)
-//			setHorizontalWeight(R.id.leftConstraintLayout, midWeight[1])
 		}
 		midConstraintSet.applyTo(viewBinding.midRow)
 //		TransitionManager.beginDelayedTransition(viewBinding.midRow)
@@ -356,9 +417,9 @@ class MainActivity : AppCompatActivity() {
 			.also { exoPlayer ->
 				exoPlayer.playWhenReady = playWhenReady
 				exoPlayer.seekTo(playbackPosition)
-//				exoPlayer.setMediaSource(buildHlsMediaSource())
 				exoPlayer.addAnalyticsListener(EventLogger())
-				exoPlayer.setMediaItem(buildHlsMediaItem())
+				val mediaItem = MediaItem.fromUri(getString(R.string.media_url_mp4))
+				exoPlayer.setMediaItem(mediaItem)
 				exoPlayer.prepare()
 			}
 

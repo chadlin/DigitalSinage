@@ -31,9 +31,9 @@
 			android:id="@+id/leftConstraintLayout"
 			android:layout_width="0dp"
 			android:layout_height="match_parent"
+			app:layout_constraintEnd_toStartOf="@id/rightConstraintLayout"
 			app:layout_constraintHorizontal_weight="3"
-			app:layout_constraintStart_toStartOf="parent"
-			app:layout_constraintEnd_toStartOf="@id/rightConstraintLayout">
+			app:layout_constraintStart_toStartOf="parent">
 
 
 		</androidx.constraintlayout.widget.ConstraintLayout>
